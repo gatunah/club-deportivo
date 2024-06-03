@@ -136,6 +136,9 @@
         tastAlert("Deporte editado");
         getData()
       })
+      .catch(() =>{
+        tastAlert("Error al editar");
+      })
     $('#exampleModal').modal('hide')
   }
 
