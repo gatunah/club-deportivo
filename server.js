@@ -14,37 +14,28 @@ app.listen(port, () => {
 
 //ESTATICOS
 app.use(express.static("public"));
-app.use("/jquery", express.static(__dirname + "/node_modules/jquery/dist"));
-app.use("/axios", express.static(__dirname + "/node_modules/axios/dist"));
+
 
 app.get("/", async (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
-app.get("/agregar", async (req, res) => {
+app.get('/agregar', async (req, res) => {
   try {
     const { nombre, precio } = req.query;
-    const deporte = { nombre, precio };
-    let data = { deportes: [] }; //INICIA COMO ARREGLO
+    const contentJson = await fs.readFile('deportes.json', 'utf-8');
+    let data = JSON.parse(contentJson);
 
-    try {
-      //LEE EL ARCHIVO
-      const contentJson = await fs.readFile("deportes.json", "utf-8");
-      data = JSON.parse(contentJson); //SOBRESCRIBE
-    } catch (err) {
-      //NO LO LOGRA LEER
-      console.error("Error al leer el archivo", err); //SI NO EXISTE DATA SIGUE SIENDO UN ARREGLO
+    const exists = data.deportes.some(deporte => deporte.nombre === nombre);
+    if (exists) {
+      return res.status(400).json({ success: false, message: 'Deporte ya existe' });
     }
 
-    data.deportes.push(deporte);
+    data.deportes.push({ nombre, precio });
+    await fs.writeFile('deportes.json', JSON.stringify(data));
 
-    await fs.writeFile("deportes.json", JSON.stringify(data));
-
-    res.status(200).json({ success: true });
+    res.status(200).json({ success: true, message: 'Deporte agregado' });
   } catch (e) {
-    console.error("Error al escribir el archivo", e);
-    res
-      .status(500)
-      .json({ success: false, message: "Error al escribir el archivo" });
+    res.status(500).json({ success: false, message: 'Error al leer o escribir el archivo' });
   }
 });
 app.get("/deportes", async (req, res) => {
