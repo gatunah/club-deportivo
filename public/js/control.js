@@ -12,7 +12,7 @@ function getData() {
         <tr>
           <th scope="row">${i + 1}</th>
           <td>${d.nombre}</td>
-          <td>${d.precio}</td>
+          <td>$${d.precio}</td>
           <td>
             <button class="btn btn-warning" onclick='preEdit("${d.nombre}","${
         d.precio
